@@ -76,7 +76,7 @@ var css = csjs`
   }
   .terminal::after {
     content           : "";
-    background-image  : url(assets/img/remix_logo_512x512.svg);
+    background-image  : url(assets/remix_logo_512x512.svg);
     opacity           : 0.1;
     top               : 15%;
     left              : 33%;

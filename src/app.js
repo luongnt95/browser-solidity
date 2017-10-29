@@ -504,6 +504,10 @@ function run () {
   // ---------------- Righthand-panel --------------------
 
   var rhpAPI = {
+    files: filesProviders['browser'],
+    oyenteMessage: (message, container, options) => {
+      renderer.error(message, container, options)
+    },
     config: config,
     setEditorSize (delta) {
       $('#righthand-panel').css('width', delta)

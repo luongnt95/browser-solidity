@@ -2,6 +2,7 @@ var yo = require('yo-yo')
 var EventManager = require('ethereum-remix').lib.EventManager
 var tabbedMenu = require('../tabs/tabbed-menu')
 var compileTab = require('../tabs/compile-tab')
+var oyenteTab = require('../tabs/oyente-tab')
 var runTab = require('../tabs/run-tab')
 var settingsTab = require('../tabs/settings-tab')
 var analysisTab = require('../tabs/analysis-tab')
@@ -118,6 +119,7 @@ function RighthandPanel (appAPI, events, opts) {
   var options = yo`
     <ul class=${css.opts}>
       <li class="${css.opts_li} compileView" title="Compile">Compile</li>
+      <li class="${css.opts_li} oyenteView" title="Oyente">Oyente</li>
       <li class="${css.opts_li} runView" title="Run">Run</li>
       <li class="${css.opts_li} settingsView" title="Settings">Settings</li>
       <li class="${css.opts_li} debugView" title="Debugger">Debugger</li>
@@ -131,7 +133,7 @@ function RighthandPanel (appAPI, events, opts) {
       ${self._view.dragbar}
       <div id="header" class=${css.header}>
         <div class=${css.menu}>
-          <img class=${css.solIcon} title="Solidity realtime compiler and runtime" src="assets/img/remix_logo_512x512.svg" alt="Solidity realtime compiler and runtime">
+          <img class=${css.solIcon} title="Solidity realtime compiler and runtime" src="assets/remix_logo_512x512.svg" alt="Solidity realtime compiler and runtime">
           ${options}
         </div>
         ${optionViews}
@@ -142,6 +144,7 @@ function RighthandPanel (appAPI, events, opts) {
     this.event.trigger('switchTab', [tabClass])
   }
   compileTab(optionViews, appAPI, events, opts)
+  oyenteTab(optionViews, appAPI, events, opts)
   runTab(optionViews, appAPI, events, opts)
   settingsTab(optionViews, appAPI, events, opts)
   analysisTab(optionViews, appAPI, events, opts)
@@ -202,6 +205,10 @@ function RighthandPanel (appAPI, events, opts) {
 }
 
 var cssTabs = yo`<style>#optionViews.settingsView #settingsView {
+    display: block;
+}
+
+#optionViews.oyenteView #oyenteTabView {
     display: block;
 }
 
