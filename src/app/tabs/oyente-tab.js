@@ -151,10 +151,16 @@ function oyenteTab (container, appAPI, appEvents, opts) {
 
   function analyze (appAPI) {
     var analyzer = new OyenteAnalyzer(appAPI)
+    var bytecode = $("#oyente-options input[name='bytecode']").val()
 
-    var currentFile = appAPI.config.get('currentFile')
-    var sources = appAPI.files.listAsTree()
-    analyzer.analyze(currentFile, sources)
+    if (bytecode) {
+      analyzer.analyze_bytecode(bytecode)
+    }
+    else {
+      var currentFile = appAPI.config.get('currentFile')
+      var sources = appAPI.files.listAsTree()
+      analyzer.analyze(currentFile, sources)
+    }
   }
 
   container.appendChild(el)

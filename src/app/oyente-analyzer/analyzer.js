@@ -41,12 +41,40 @@ var css = csjs`
     float: left;
     align-self: center;
   }
-  .contract {
+  .title {
     text-align: center;
   }
 `
 
 function Analyzer (appAPI) {
+  this.analyze_bytecode = function (bytecode) {
+    analysisStarted()
+    var data = get_options()
+    data['bytecode'] = bytecode
+    var cb = {}
+
+    cb.error = error
+
+    cb.success = function (response) {
+      var result = response.result
+      if (result.hasOwnProperty('error')) {
+        var err = yo`<div></div>`
+        analysisFinished(render_error(err, result.error, appAPI))
+      }
+      else {
+        var ret = yo`
+          <div>
+            <div class="${border_color(result)}">
+              <div>${general_result(result, 'Bytecode analysis result')}</div>
+            </div>
+          </div>
+        `
+        analysisFinished(ret)
+      }
+    }
+    request_analysis('home/analyze_bytecode', data, cb)
+  }
+
   this.analyze = function (current_file, sources) {
     analysisStarted()
 
@@ -55,42 +83,50 @@ function Analyzer (appAPI) {
     data['current_file'] = current_file
     var cb = {}
 
-    cb.error = function () {
-      var error = yo`<div>
-        Some errors occured. Please try again!
-      </div>`
-      analysisFinished(error)
-    }
+    cb.error = error
 
     cb.success = function (response) {
       var sources = response.sources
-      var ret = yo`<div>
-        ${Object.keys(sources).map(function (source) {
-          return yo`<div>
-            <div style="font-weight: bold">${source}</div>
-              ${Object.keys(sources[source]).map(function (contract) {
-                return yo`<div>
-                  <div class="${ border_color(sources[source][contract]) }">
-                    <div>${general_result(sources, source, contract)}</div>
-                    <div>
-                      <div class="${ display_details(sources[source][contract]) }" onclick=${(e) => { details(e) }}>Details</div>
-                      ${ render_details( yo`<div style='display: none'></div>`, sources[source][contract], appAPI ) }
+      if (sources.hasOwnProperty('error')) {
+        var err = yo`<div></div>`
+        analysisFinished(render_error(err, sources.error, appAPI))
+      }
+      else {
+        var ret = yo`<div>
+          ${Object.keys(sources).map(function (source) {
+            return yo`<div>
+              <div style="font-weight: bold">${source}</div>
+                ${Object.keys(sources[source]).map(function (contract) {
+                  return yo`<div>
+                    <div class="${ border_color(sources[source][contract]) }">
+                      <div>${general_result(sources[source][contract], `${source}:${contract}`)}</div>
+                      <div>
+                        <div class="${ display_details(sources[source][contract]) }" onclick=${(e) => { details(e) }}>Details</div>
+                        ${ render_details( yo`<div style='display: none'></div>`, sources[source][contract], appAPI ) }
+                      </div>
                     </div>
-                  </div>
-                </div>`
-              })}
-          </div>`
-        })}
-      </div>`
-      analysisFinished(ret)
+                  </div>`
+                })}
+            </div>`
+          })}
+        </div>`
+        analysisFinished(ret)
+      }
     }
-    request_analysis(data, cb)
+    request_analysis('home/analyze', data, cb)
   }
 }
 
 module.exports = Analyzer
 
     // HELPERS
+
+function error (jqXHR, exception) {
+  var error = yo`<div>
+    Some errors occured. Please try again!
+  </div>`
+  analysisFinished(error)
+}
 
 function get_options () {
   var data = {}
@@ -123,9 +159,9 @@ function display_details (contract) {
 }
 
 function any_bug (contract) {
-  for (var bug in contract.bugs) {
-    if (contract.bugs.hasOwnProperty(bug)) {
-      if (contract.bugs[bug] !== false) {
+  for (var vul in contract.vulnerabilities) {
+    if (contract.vulnerabilities.hasOwnProperty(vul)) {
+      if (contract.vulnerabilities[vul] !== false) {
         return true
       }
     }
@@ -133,28 +169,28 @@ function any_bug (contract) {
   return false
 }
 
-function general_result (sources, source, contract) {
-  var bugs = sources[source][contract]["bugs"]
-  var bug_names = {
+function general_result (result, title) {
+  var vul_names = {
     callstack: "Callstack Depth Attack Vulnerability",
     money_concurrency: "Transaction-Ordering Dependence (TOD)",
     time_dependency: "Timestamp Dependency",
     reentrancy: "Re-Entrancy Vulnerability",
     assertion_failure: "Assertion failure"
   }
+  var vuls = result["vulnerabilities"]
 
   return yo`
     <div>
-      <div class="${css.contract}">${source}:${contract}</div>
+      <div class="${css.title}">${title}</div>
       <div>
         <div class="${css.col1_1}">EVM code coverage:</div>
-        <div>${sources[source][contract].evm_code_coverage}%</div>
+        <div>${result.evm_code_coverage}%</div>
       </div>
-      ${Object.keys(bugs).map(function (bug) {
+      ${Object.keys(vuls).map(function (vul) {
           return yo`
             <div>
-              <div class="${css.col1_1}">${bug_names[bug]}:</div>
-              ${ bug_exist(yo`<div></div>`, bugs[bug]) }
+              <div class="${css.col1_1}">${vul_names[vul]}:</div>
+              ${ bug_exist(yo`<div></div>`, vuls[vul]) }
             </div>
           `
         })
@@ -181,11 +217,16 @@ function details (e) {
 }
 
 function render_details (el, contract, appAPI) {
-  for (var bug in contract.bugs) {
-    if (contract.bugs.hasOwnProperty(bug) && contract.bugs[bug] !== false) {
-      appAPI.oyenteMessage(contract.bugs[bug], $(el), {type: "warning"})
+  for (var vul in contract.vulnerabilities) {
+    if (contract.vulnerabilities.hasOwnProperty(vul) && contract.vulnerabilities[vul] !== false) {
+      appAPI.oyenteMessage(contract.vulnerabilities[vul], $(el), {type: "warning"})
     }
   }
+  return el
+}
+
+function render_error (el, message, appAPI) {
+  appAPI.oyenteMessage(message, $(el), {type: 'error'})
   return el
 }
 
@@ -212,10 +253,10 @@ function analysisFinished (results) {
   $('#oyenteResult').fadeIn()
 }
 
-function request_analysis (data, cb) {
+function request_analysis (url, data, cb) {
   $.ajax({
     type: 'POST',
-    url: 'home/analyze',
+    url: url,
     data: { 'data': data },
     dataType: 'json',
     error: function(jqXHR, exception) {
