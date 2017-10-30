@@ -160,10 +160,12 @@ function display_details (contract) {
 
 function any_bug (contract) {
   for (var vul in contract.vulnerabilities) {
-    if (contract.vulnerabilities.hasOwnProperty(vul)) {
-      if (contract.vulnerabilities[vul] !== false) {
-        return true
-      }
+    var warnings = contract.vulnerabilities[vul]
+    if (warnings instanceof Array) {
+      if (warnings.length > 0) return true
+    }
+    else {
+      if (warnings) return true
     }
   }
   return false
@@ -190,7 +192,7 @@ function general_result (result, title) {
           return yo`
             <div>
               <div class="${css.col1_1}">${vul_names[vul]}:</div>
-              ${ bug_exist(yo`<div></div>`, vuls[vul]) }
+              ${ is_vulnerable(yo`<div></div>`, vuls[vul]) }
             </div>
           `
         })
@@ -200,13 +202,23 @@ function general_result (result, title) {
 }
 
 
-function bug_exist (el, bug_value) {
+function is_vulnerable (el, warnings) {
   var $el = $(el)
-  if (bug_value === false) {
-    $el.css('color', 'green').text("False")
+  if (warnings instanceof Array) {
+    if (warnings.length > 0) {
+      $el.css('color', 'red').text("True")
+    }
+    else {
+      $el.css('color', 'green').text("False")
+    }
   }
   else {
-    $el.css('color', 'red').text("True")
+    if (warnings) {
+      $el.css('color', 'red').text("True")
+    }
+    else {
+      $el.css('color', 'green').text("False")
+    }
   }
   return el
 }
@@ -218,8 +230,24 @@ function details (e) {
 
 function render_details (el, contract, appAPI) {
   for (var vul in contract.vulnerabilities) {
-    if (contract.vulnerabilities.hasOwnProperty(vul) && contract.vulnerabilities[vul] !== false) {
-      appAPI.oyenteMessage(contract.vulnerabilities[vul], $(el), {type: "warning"})
+    // contract.vulnerabilities[vul].forEach(function (warning) {
+    for (var i in contract.vulnerabilities[vul]) {
+      var warning = contract.vulnerabilities[vul][i]
+      if (warning instanceof Array) { //money concurrency
+        for (var j in warning) {
+          if (j == 0) {
+            var s = `Flow ${i}\n`
+          }
+          else {
+            var s = ''
+          }
+          s += warning[j]
+          appAPI.oyenteMessage(s, $(el), {type: "warning"})
+        }
+      }
+      else {
+        appAPI.oyenteMessage(warning, $(el), {type: "warning"})
+      }
     }
   }
   return el
