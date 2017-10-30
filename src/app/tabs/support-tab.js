@@ -59,9 +59,8 @@ var css = csjs`
 var infoText = yo`
   <div>
     Have a question, found a bug or want to propose a feature? Have a look at the
-    <a href='https://github.com/ethereum/browser-solidity/issues'> issues</a> or check out
-    <a href='https://remix.readthedocs.io/en/latest/'> the documentation page on Remix</a> or
-    <a href='https://solidity.readthedocs.io/en/latest/'> Solidity</a>.
+    <a href='https://github.com/melonproject/oyente/issues'> issues</a> or check out
+    <a href='https://github.com/melonproject/oyente/blob/master/code.md'> the code structure</a>.
   </div>
 `
 
@@ -78,9 +77,9 @@ function supportTab (container, appAPI, events, opts) {
       <div class="${css.chat}">
         <div class="${css.chatTitle}" onclick=${openLink} title='Click to open chat in Gitter'>
           <img class="${css.icon}" title="Solidity" src="assets/remix_logo_512x512.svg">
-          <div class="${css.chatTitleText}">ethereum/remix community chat</div>
+          <div class="${css.chatTitleText}">melonproject/oyente community chat</div>
         </div>
-        <iframe class="${css.chatIframe}" src='https://gitter.im/ethereum/remix/~embed'>
+        <iframe class="${css.chatIframe}" src='https://gitter.im/melonproject/oyente/~embed'>
       </div>
     </div>
   `
@@ -88,5 +87,5 @@ function supportTab (container, appAPI, events, opts) {
 }
 
 function openLink () {
-  window.open('https://gitter.im/ethereum/remix')
+  window.open('https://gitter.im/melonproject/oyente')
 }
