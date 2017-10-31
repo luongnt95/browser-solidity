@@ -177,7 +177,7 @@ function general_result (result, title) {
     money_concurrency: "Transaction-Ordering Dependence (TOD)",
     time_dependency: "Timestamp Dependency",
     reentrancy: "Re-Entrancy Vulnerability",
-    assertion_failure: "Assertion failure"
+    assertion_failure: "Assertion Failure"
   }
   var vuls = result["vulnerabilities"]
 
