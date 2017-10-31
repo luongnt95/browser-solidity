@@ -107,7 +107,7 @@ function oyenteTab (container, appAPI, appEvents, opts) {
     title="The maximum number of iterations that Oyente will follow when encounter a loop. Both the analysis accuracy and the run time rise as this value increases.">`
   var email = yo`<input class="${css.col2}" name="email" type="email"
     title="The result will be sent to this email after the analysis is done" placeholder="contact@example.com">`
-  var bytecode = yo`<input class="${css.col2}" name="bytecode" type="text">`
+  var bytecode = yo`<input class="${css.col2}" name="bytecode" type="text" placeholder="i.e. 606060...">`
 
   var info = yo`
     <div class="${css.info}">
