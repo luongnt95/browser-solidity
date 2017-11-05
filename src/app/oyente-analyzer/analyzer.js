@@ -56,16 +56,16 @@ function Analyzer (appAPI) {
     cb.error = error
 
     cb.success = function (response) {
-      var result = response.result
-      if (result.hasOwnProperty('error')) {
+      var contract = response.contract
+      if (contract.hasOwnProperty('error')) {
         var err = yo`<div></div>`
-        analysisFinished(render_error(err, result.error, appAPI))
+        analysisFinished(render_error(err, contract.error, appAPI))
       }
       else {
         var ret = yo`
           <div>
-            <div class="${border_color(result)}">
-              <div>${general_result(result, 'Bytecode analysis result')}</div>
+            <div class="${border_color(contract)}">
+              <div>${general_result(contract, 'Bytecode analysis result')}</div>
             </div>
           </div>
         `
@@ -171,7 +171,7 @@ function any_bug (contract) {
   return false
 }
 
-function general_result (result, title) {
+function general_result (contract, title) {
   var vul_names = {
     callstack: "Callstack Depth Attack Vulnerability",
     money_concurrency: "Transaction-Ordering Dependence (TOD)",
@@ -179,14 +179,14 @@ function general_result (result, title) {
     reentrancy: "Re-Entrancy Vulnerability",
     assertion_failure: "Assertion Failure"
   }
-  var vuls = result["vulnerabilities"]
+  var vuls = contract["vulnerabilities"]
 
   return yo`
     <div>
       <div class="${css.title}">${title}</div>
       <div>
-        <div class="${css.col1_1}">EVM code coverage:</div>
-        <div>${result.evm_code_coverage}%</div>
+        <div class="${css.col1_1}">EVM Code Coverage:</div>
+        <div>${contract.evm_code_coverage}%</div>
       </div>
       ${Object.keys(vuls).map(function (vul) {
           return yo`
