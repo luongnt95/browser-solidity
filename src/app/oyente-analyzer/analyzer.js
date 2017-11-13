@@ -173,6 +173,7 @@ function any_bug (contract) {
 
 function general_result (contract, title) {
   var vul_names = {
+    parity_multisig_bug_2: "Parity Multisig Bug 2",
     callstack: "Callstack Depth Attack Vulnerability",
     money_concurrency: "Transaction-Ordering Dependence (TOD)",
     time_dependency: "Timestamp Dependency",
